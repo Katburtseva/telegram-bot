@@ -1,6 +1,7 @@
 import random
-from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram import Update, InlineQueryResultArticle, InputTextMessageContent
+from telegram.ext import Application, CommandHandler, MessageHandler, InlineQueryHandler, filters, ContextTypes
+import uuid
 
 BOT_TOKEN = "8372379665:AAFjHFztodzZTBz8gBVSrhECQmx9CTjoHeI"
 
@@ -11,53 +12,35 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "на сколько процентов это про тебя!\n\n"
     )
 
-async def percent(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    value = random.randint(0, 100)
-    if value <= 20:
-        emoji = "sad"
-    elif value <= 40:
-        emoji = "ok"
-    elif value <= 60:
-        emoji = "good"
-    elif value <= 80:
-        emoji = "great"
-    else:
-        emoji = "fire"
-    await update.message.reply_text(f"Result: {value}% {emoji}")
-
 async def random_percent_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.message
     text = message.text
-    bot_username = context.bot.username
+    value = random.randint(0, 100)
+    await message.reply_text(f"Вопрос: {text}\n\nОтвет: {value}%")
 
-    if message.chat.type in ["group", "supergroup"]:
-        mention = "@" + bot_username
-        if mention.lower() not in text.lower():
-            return
-        text = text.replace(mention, "").strip()
-        if not text:
-            text = "это"
+async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.inline_query.query.strip()
+    if not query:
+        query = "это"
 
     value = random.randint(0, 100)
-    if value <= 20:
-        emoji = "sad"
-    elif value <= 40:
-        emoji = "ok"
-    elif value <= 60:
-        emoji = "good"
-    elif value <= 80:
-        emoji = "great"
-    else:
-        emoji = "fire"
+    result_text = f"Вопрос: {query}\n\nОтвет: {value}%"
 
-    await message.reply_text(f"? {text}\n\nAnswer: {value}% {emoji}")
+    results = [
+        InlineQueryResultArticle(
+            id=str(uuid.uuid4()),
+            title=f"{query} — {value}%",
+            input_message_content=InputTextMessageContent(result_text)
+        )
+    ]
+    await update.inline_query.answer(results)
 
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("percent", percent))
+    app.add_handler(InlineQueryHandler(inline_query))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, random_percent_message))
-    print("Bot started!")
+    print("Бот запущен!")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
