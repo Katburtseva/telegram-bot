@@ -21,7 +21,7 @@ async def random_percent_message(update: Update, context: ContextTypes.DEFAULT_T
 async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.inline_query.query.strip()
     if not query:
-        query = "это"
+        return
 
     value = random.randint(0, 100)
     result_text = f"Вопрос: {query}\n\nОтвет: {value}%"
@@ -29,11 +29,12 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     results = [
         InlineQueryResultArticle(
             id=str(uuid.uuid4()),
-            title=f"{query} — {value}%",
+            title=query,
+            description="Нажми чтобы узнать результат",
             input_message_content=InputTextMessageContent(result_text)
         )
     ]
-    await update.inline_query.answer(results)
+    await update.inline_query.answer(results, cache_time=0)
 
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
