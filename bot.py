@@ -8,11 +8,9 @@ BOT_TOKEN = "8372379665:AAFjHFztodzZTBz8gBVSrhECQmx9CTjoHeI"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "👋 Привет! Я бот рандомных процентов!\n\n"
+        "👋 Привет!\n\n"
         "Напиши любое слово или фразу, и я скажу, "
         "на сколько процентов это про тебя!\n\n"
-        "Например: «Насколько я красивый?»\n"
-        "Или используй команду /percent"
     )
 
 
@@ -49,7 +47,7 @@ async def random_percent_message(update: Update, context: ContextTypes.DEFAULT_T
         emoji = "🔥"
 
     await update.message.reply_text(
-        f"❓ «{text}»\n\n🎲 Ответ: {value}% {emoji}"
+        f"❓ «{text}»\n\nОтвет: {value}% {emoji}"
     )
 
 
