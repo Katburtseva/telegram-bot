@@ -122,7 +122,7 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     results = [
         InlineQueryResultArticle(
             id=str(uuid.uuid4()),
-            title=f"{emoji} {query}",
+            title=query,
             description="Нажми чтобы узнать результат!",
             input_message_content=InputTextMessageContent(
                 result_text,
