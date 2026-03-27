@@ -77,7 +77,7 @@ def format_result(text: str, value: int) -> str:
     comment = get_comment_by_value(value)
 
     return (
-        f"{emoji} <b>{text}</b>\n"
+        f"<b>{text}</b>\n"
         f"\n"
         f"┌─────────────────────┐\n"
         f"│  {bar}  {value:>3}%  │\n"
