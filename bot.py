@@ -158,6 +158,20 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not query:
         return
 
+    choice_options = build_choice_options(query)
+    if choice_options:
+        chosen = random.choice(choice_options)
+        results = [
+            InlineQueryResultArticle(
+                id=str(uuid.uuid4()),
+                title=chosen,
+                description=f"Выбор: {chosen}",
+                input_message_content=InputTextMessageContent(chosen),
+            )
+        ]
+        await update.inline_query.answer(results, cache_time=0)
+        return
+
     value = random.randint(0, 100)
     result_text = format_result(query, value)
 
