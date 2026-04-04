@@ -94,21 +94,23 @@ def format_result(text: str, value: int) -> str:
     )
 
 
+def format_choice_result(text: str, chosen: str) -> str:
+    return (
+        f"<b>{text}</b>\n"
+        f"\n"
+        f"Ответ: <b>{chosen}</b>"
+    )
+
+
 def build_choice_options(text: str) -> tuple[str, str] | None:
     options = re.split(r"\s+или\s+", text, maxsplit=1, flags=re.IGNORECASE)
     if len(options) != 2:
         return None
 
-    option1 = options[0].strip(" \"'")
-    option2 = options[1].strip(" \"'")
+    option1 = options[0].strip(" \"'.,!?")
+    option2 = options[1].strip(" \"'.,!?")
     if not option1 or not option2:
         return None
-
-    option1_words = option1.split()
-    option2_words = option2.split()
-
-    if len(option1_words) > 1 and len(option2_words) == 1:
-        option2 = " ".join(option1_words[:-1] + [option2_words[0]])
 
     return option1, option2
 
@@ -146,7 +148,7 @@ async def random_percent_message(update: Update, context: ContextTypes.DEFAULT_T
     choice_options = build_choice_options(text)
     if choice_options:
         chosen = random.choice(choice_options)
-        await message.reply_text(chosen)
+        await message.reply_text(format_choice_result(text, chosen), parse_mode="HTML")
         return
 
     value = random.randint(0, 100)
@@ -161,12 +163,16 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     choice_options = build_choice_options(query)
     if choice_options:
         chosen = random.choice(choice_options)
+        result_text = format_choice_result(query, chosen)
         results = [
             InlineQueryResultArticle(
                 id=str(uuid.uuid4()),
                 title="Нажми, чтобы узнать выбор",
                 description=query,
-                input_message_content=InputTextMessageContent(chosen),
+                input_message_content=InputTextMessageContent(
+                    result_text,
+                    parse_mode="HTML",
+                ),
             )
         ]
         await update.inline_query.answer(results, cache_time=0)
